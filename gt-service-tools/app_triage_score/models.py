@@ -8,7 +8,7 @@ class Threshold(BaseModel):
 
 
 class Patient(BaseModel):
-    id: UUID
+    id: Optional[UUID] = None
     name: str
     external_hemorrhage: Optional[int] = None
     tension_pneumothorax: Optional[int] = None
