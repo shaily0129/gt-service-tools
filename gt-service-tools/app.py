@@ -1,36 +1,53 @@
-from services.service_triage.factory.FactoryAlgoTriage import TriageFactory, Threshold
-from services.service_triage.factory.FactoryAlgoTriage import TriageAlgoName
-from services.models.ModelPatient import Patient
+from http.client import HTTPException
+from aem import app
+import uvicorn
+from caching.CacheRedis import RedisManager
+
+# from models.Models import BookingInteractionRequest
+from services.models.Models import TriageInteractionRequest
+
+# from services.HolidayBooking.ServiceBookHoliday import ServiceHolidayBooking
+from services.service_triage_category.algos.pyreason.algo_triage_basic.AlgoTriageCategoryInteraction import (
+    TriageCategoryBasic,
+)
+from utils.app_utils import app
+from fastapi import Request
+from utils.Utils import load_env_file
+
+
+@app.post("/tools/triage", tags=["Triage"])
+async def rate_response(
+    request: Request, triage: TriageInteractionRequest
+) -> TriageInteractionRequest:
+    try:
+        # Step 1. Setup Caching Manager
+        load_env_file("dev.env")
+        caching_manager = RedisManager()
+        key = f"tools-triage-{triage.request_id}"
+
+        # Step 2. Check for new or complete interaction request
+        cached_bir_json = caching_manager.get_json(key)
+        if cached_bir_json is None:
+            caching_manager.save_json(key, triage.json())
+        else:
+            cached_bir = TriageInteractionRequest(**cached_bir_json)
+            if cached_bir.complete:
+                return cached_bir
+
+        # Step 3. Interaction request is still WIP, so run booking service and cache result
+        bir = TriageCategoryBasic().run_triage_algo(triage_interaction_request=triage)
+        caching_manager.save_json(key, bir.json())
+
+        return bir
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
-    thresholds_data_algo1 = {
-        'hr': Threshold(min_value=10, max_value=140),
-        'spo2': Threshold(min_value=90, max_value=95),
-        'temp': Threshold(min_value=0, max_value=100)
-    }
+    # Rapid Debugging start app with this
+    # uvicorn.run("app:app", host="0.0.0.0", port=8002, reload=True)
 
-    thresholds_data_algo2 = {
-        'bp': Threshold(min_value=10, max_value=140),
-        'glucose': Threshold(min_value=90, max_value=95),
-        'gcs': Threshold(min_value=6, max_value=15)
-    }
-
-    patient1 = Patient(hr=130, spo2=85, temp=102)
-    patient2 = Patient(hr=130, bp=110, glucose=90,gcs=4)
-
-    # Triage Algo 1 - Patients 1 & 2
-    print("ALGO 1")
-    triage_basic_algo = TriageFactory.create_triage_algo(TriageAlgoName.BASIC,thresholds=thresholds_data_algo1)
-    triage_score_patient1 = triage_basic_algo.triage(patient1)
-    print(f"Patient 1 has the following Triage Score {triage_score_patient1}")
-    triage_score_patient2 = triage_basic_algo.triage(patient2)
-    print(f"Patient 2 has the following Triage Score {triage_score_patient2}")
-
-    # Triage Algo 2 - Patients 1 & 2
-    print("")
-    print("ALGO 2")
-    triage_basic2_algo = TriageFactory.create_triage_algo(TriageAlgoName.BASIC2, thresholds=thresholds_data_algo2)
-    triage_score_patient1 = triage_basic2_algo.triage(patient1)
-    print(f"Patient 1 has the following Triage Score {triage_score_patient1}")
-    triage_score_patient2 = triage_basic2_algo.triage(patient2)
-    print(f"Patient 2 has the following Triage Score {triage_score_patient2}")
+    # For Docker Builds
+    uvicorn.run(app, host="0.0.0.0", port=8002)

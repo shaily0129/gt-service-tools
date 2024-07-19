@@ -1,2 +1,0 @@
-trigger_optimization(P) <-0 possible_cf(P,C)
-final_cf(P,C) <-0 mlp_optimized(P,C)
