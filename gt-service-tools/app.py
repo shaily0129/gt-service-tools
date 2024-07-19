@@ -1,5 +1,4 @@
 from http.client import HTTPException
-from aem import app
 import uvicorn
 from caching.CacheRedis import RedisManager
 
@@ -11,7 +10,7 @@ from services.service_triage_category.algos.pyreason.algo_triage_basic.AlgoTriag
     TriageCategoryBasic,
 )
 from utils.app_utils import app
-from fastapi import Request
+from fastapi import Request, HTTPException
 from utils.Utils import load_env_file
 
 
