@@ -1,0 +1,6 @@
+{
+  "python.analysis.extraPaths": [
+    "./gt-service-tools",
+    "./gt-service-tools/services"
+]
+}
