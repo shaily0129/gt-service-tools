@@ -4,7 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 app = FastAPI(
-    title="gt-service-tools DEMO",
+    title="ASU Tools",
     description="Demo of using an interactive tools ",
     version="0.0.1",
 )
