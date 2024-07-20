@@ -18,7 +18,7 @@ from caching.CacheRedis import RedisManager
 from services.models.Models import (
     Interaction,
     InteractionOption,
-    TriageInteractionRequest,
+    TriageInteractionRequest1,
     InteractionRequest,
 )
 from services.service_triage_category import AlgoTriageCategory
@@ -205,8 +205,8 @@ class TriageCategoryBasic(Triage):
         return interactions
 
     def run_triage_algo(
-        self, triage_interaction_request: TriageInteractionRequest
-    ) -> TriageInteractionRequest:
+        self, triage_interaction_request: TriageInteractionRequest1
+    ) -> TriageInteractionRequest1:
         # Step1 - Get the requested params list
         parameters = triage_interaction_request.params
 
