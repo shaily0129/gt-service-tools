@@ -25,7 +25,7 @@ app = FastAPI(
 )
 
 
-@app.post("/tools/triage", tags=["Triage"])
+@app.post("/tools/triage_score", tags=["Triage"])
 async def rate_response(
     request: Request, body: TriageRequestBody = Body(...)
 ) -> TriageInteractionRequest:
