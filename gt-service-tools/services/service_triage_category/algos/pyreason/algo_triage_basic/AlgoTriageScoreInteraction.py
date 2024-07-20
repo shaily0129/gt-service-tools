@@ -154,7 +154,7 @@ class TriageScoreInteraction(Triage):
                     )
                 )
                 continue
-
+            print(score)
             triage_scores.append(
                 TriageScore(
                     patient_name=record["name"],
@@ -186,7 +186,7 @@ class TriageScoreInteraction(Triage):
         # Calculate Triage Score
         triage_scores = self.triage([patient])
         if triage_scores:
-            triage_interaction_request.triage_category = triage_scores[0]
+            triage_interaction_request.triage_score = triage_scores[0]
         triage_interaction_request.complete = True
         triage_interaction_request.interactions = None
 

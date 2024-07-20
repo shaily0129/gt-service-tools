@@ -2,7 +2,9 @@ from typing import List, Optional, Any
 
 from pydantic import BaseModel
 from pydantic import BaseModel, ValidationError, field_validator
-from services.models.ModelTriageCategory import TriageCategory
+
+# from services.models.ModelTriageCategory import TriageCategory
+from services.models.ModelTriageScore import TriageScore
 
 
 class InteractionOption(BaseModel):
@@ -33,7 +35,7 @@ class BookingInteractionRequest(InteractionRequest):
 
 class TriageInteractionRequest(InteractionRequest):
     patient_id: Optional[str] = None
-    triage_category: Optional[TriageCategory] = None
+    triage_score: Optional[TriageScore] = None
 
 
 class EvacStrandedPersonnelInteractionRequest(InteractionRequest):
