@@ -101,12 +101,13 @@ class TriageScoreInteraction(Triage):
             if not record:
                 triage_scores.append(
                     TriageScore(
-                        patient_name=record["name"],
+                        patient_name=record.get("name", "Unknown"),
                         score=0.0,
                         rationale=rationale_records,
                         datetime_seconds=int(datetime.now().timestamp()),
                         algo_name="LifeTriage",
                         interaction=None,
+                        confidence=0.0,  # Set a default value for confidence
                     )
                 )
                 continue
@@ -145,19 +146,20 @@ class TriageScoreInteraction(Triage):
             else:
                 triage_scores.append(
                     TriageScore(
-                        patient_name=record["name"],
+                        patient_name=record.get("name", "Unknown"),
                         score=0.0,
                         rationale=[],
                         datetime_seconds=int(datetime.now().timestamp()),
                         algo_name="None",
                         interaction=None,
+                        confidence=0.0,  # Set a default value for confidence
                     )
                 )
                 continue
             print(score)
             triage_scores.append(
                 TriageScore(
-                    patient_name=record["name"],
+                    patient_name=record.get("name", "Unknown"),
                     datetime_seconds=int(datetime.now().timestamp()),
                     algo_name=algo_name,
                     score=score,
@@ -199,18 +201,6 @@ class TriageScoreInteraction(Triage):
 
     def missing_values(self, params: Dict) -> List[Interaction]:
         interactions = []
-        mandatory_fields = ["gcs", "sbp", "rr", "name"]
-
-        for field in mandatory_fields:
-            if field not in params or not params[field]:
-                interaction = Interaction(
-                    variable_name=field,
-                    variable_type="str",
-                    question=f"Please provide the value for {field}:",
-                    options=None,
-                    answer=None,
-                    complete=False,
-                )
-                interactions.append(interaction)
+        # No mandatory fields
 
         return interactions
